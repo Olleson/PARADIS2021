@@ -4,6 +4,9 @@ Prime Factorizer with a shared State-class. State-class has a lock and a complet
 Each thread synchronizes with its lock, meaning that only one thread can update Factor1 and Factor2 if
 it ever finds the factors. However, the outer loop reads the State class's state, therefore 
 this implementation is not thread safe. (The reading is unprotected and unsynchronized).
+
+*EDIT: Not thread safe as the outer while loop is reading a variable that can be different in all threads. Would be thread safe if you somehow synchronize the reading.
+       Not sure how you'd achieve that without making the factorizer grossly inefficient but, idk.
 */
 
 // package paradis.assignment1;

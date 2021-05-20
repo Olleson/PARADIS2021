@@ -1,5 +1,4 @@
-// Peter Idestam-Almquist, 2020-01-31.
-// Olivia Aixinjuelo, 2020-03-05.
+// Olivia Aixinjuelo, 2021-03-05.
 
 /*
 Thread safety with ReentrantReadWriteLocks. Reads are managed with Read lock, Writes are managed with Write lock on a per account basis.

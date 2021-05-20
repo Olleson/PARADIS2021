@@ -1,0 +1,47 @@
+2021-03-09
+Olivia Jiayi Xu
+
+Q1) Which of the two programs, Program1 and Program2, has best performance, or are the performance of the two programs about the same?
+My Program1 is slightly faster than Program2.  
+
+Program1 times:
+1.0445588
+1.0520333
+1.0386494
+1.0514962
+1.0302688
+1.0775461
+1.0624651
+1.0548731
+1.0429395
+1.0288106
+
+Program2 times:
+1.3047406
+1.3138838
+1.3479334
+1.2995248
+1.3249264
+1.2971561
+1.3203017
+1.3189043
+1.3225967
+1.3232275
+
+Q2) Is there any difference in which order different work tasks are performed in the two different solutions, Program1 and Program2?
+
+There is a difference, yes.
+
+Program1 triggers all of the downloads, then all of the analysis, then all of the categorisations (no guarantee that each will be completed before triggering the next stage).
+However, nothing will be analysed until there are pages to analyze (which comes from downloading). So each stage functions as a consumer by sitting and blocking to 
+consume while also producing work for the next stage (analysis or categorisation).
+e.g.
+    block while waiting for task in queue
+    consume task by downloading/analysing/categorizing
+    add this web page for the next queue
+
+Program2 doesn't "trigger" in the same way as Program1. It instead goes through each Web Page in the list and does the following:
+    download
+    analysed
+    categorize
+for each page. It's tied down by the fact that it has to go through each webpage one stage at a time despite being done on multiple threads at the same time.

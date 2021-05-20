@@ -1,0 +1,97 @@
+// Peter Idestam-Almquist, 2021-03-17.
+
+//package paradis.exam210319.task3;
+
+import java.util.function.Consumer;
+
+class DoubleLinkedList<E> {
+	
+	// Inner class.
+	class Item<E> {
+		// Inner class instance variables.
+		E content;
+		Item<E> prev;
+		Item<E> next;
+		
+		// Inner class constructor.
+		Item(E element) {
+			content = element;
+			prev = null;
+			next = null;
+		}
+	}
+	
+	// Instance variables.
+	private final Item<E> first;
+	private final Item<E> last;
+
+	// Constructor.
+	DoubleLinkedList() {
+		// We include two dummy items (one first and one last) to simplify the code.
+		first = new Item<E>(null);
+		last = new Item<E>(null);
+		first.next = last;
+		last.prev = first;
+	}
+	
+	// Instance methods.
+	
+	// Inserts the specified element at the specified position in this list. 
+	void add(int index, E element) {
+		Item<E> item = new Item<E>(element);
+		Item<E> temp = first;
+
+		// Find the item just before where the new item should be inserted.
+		for (int i = 0; i < index; i++) {
+			temp = temp.next;
+			if (temp.next == null)
+				throw new IndexOutOfBoundsException();
+		}
+		
+		// Insert the new item.
+		temp.next.prev = item;
+		item.next = temp.next;
+		temp.next = item;
+		item.prev = temp;
+	}
+
+	// Removes and returns the element at the specified position in this list.
+	E remove(int index) {
+		Item<E> item = null;
+		Item<E> temp = first;
+		
+		// Find the item just before the item that should be removed.
+		if (temp.next.next == null)
+			throw new IndexOutOfBoundsException();
+		for (int i = 0; i < index; i++) {
+			temp = temp.next;
+			if (temp.next.next == null)
+				throw new IndexOutOfBoundsException();
+		}
+
+		// Remove the item.
+		item = temp.next;
+		temp.next.next.prev = temp;
+		temp.next = temp.next.next;
+		item.prev = null;
+		item.next = null;
+
+		return item.content;
+	}
+	
+	// Performs the given action for each element in this list. 
+	void forEach(Consumer<E> action) {
+		Item<E> temp = first;
+
+		while (temp.next.next != null) {
+			temp = temp.next;
+			action.accept(temp.content);
+		}
+	}
+	
+	// Execution entry point.
+	public static void main(String[] args) {
+		// Here you can write some test program.
+		
+	}
+}

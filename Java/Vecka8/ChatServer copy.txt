@@ -1,0 +1,159 @@
+// Peter Idestam-Almquist, 2021-03-07.
+// Server, multi-threaded, accepting several simultaneous connectedClients.
+
+//package paradis.assignment4;
+package Java.Vecka8;
+
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.net.SocketAddress;
+import java.io.PrintWriter;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+/*
+BASIC
+X the chat server should all the time in parallel listen to incoming messages from all connected connectedClients
+X the chat server should be thread safe
+X all messages sent from the chat server should have a prefix “name: ”, where “name” is the identity of the client who originally sent the message
+X an appropriate data structure should be used to hold some kind of references to all connected connectedClients, in such a way that no locking is needed when updating or iterating over the data structure
+X all messages the chat server receives should be sent to all connectedClients (including the client that originally sent the message
+
+ADVANC
+X all outgoing messages from the chat server should be sent in parallel to all connectedClients
+the code of the chat server should not include anylocks
+the solution should guarantee that all messages to all connectedClients are sent in the same order as the chat server received them
+*/
+class ChatServer implements Runnable {
+    private final static int PORT = 8000;
+    private final static int MAX_CLIENTS = 5;
+    private final static int MAX_MESSAGES = 15;
+    private final static Executor executor = Executors.newFixedThreadPool(MAX_CLIENTS);
+    // private BlockingQueue<String> clientMessageQueue = new
+    // ArrayBlockingQueue<>(MAX_MESSAGES);
+
+    private final Socket clientSocket;
+    private ConcurrentHashMap<SocketAddress, Socket> connectedClients;
+    // private BlockingQueue<String> messageQueue;
+
+    private String clientName = "";
+
+    private ChatServer(Socket clientSocket, ConcurrentHashMap<SocketAddress, Socket> connectedClients,
+            BlockingQueue<String> queue) {
+        this.clientSocket = clientSocket;
+        this.connectedClients = connectedClients;
+        // this.messageQueue = queue;
+    }
+
+    public void run() {
+        SocketAddress remoteSocketAddress = clientSocket.getRemoteSocketAddress();
+        SocketAddress localSocketAddress = clientSocket.getLocalSocketAddress();
+        System.out.println("Accepted client " + remoteSocketAddress + " (" + localSocketAddress + ").");
+
+        PrintWriter socketWriter = null;
+        BufferedReader socketReader = null;
+        try {
+            socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            String threadInfo = " (" + Thread.currentThread().getName() + ").";
+            String inputLine = socketReader.readLine();
+            System.out.println("Received: \"" + inputLine + "\" from " + remoteSocketAddress + threadInfo);
+
+            clientName = inputLine + ": "; // Client name
+
+            while (inputLine != null) {
+                inputLine = socketReader.readLine();
+                if (inputLine == null)
+                    break;
+
+                String message = inputLine;
+                for (ConcurrentHashMap.Entry<SocketAddress, Socket> entry : connectedClients.entrySet()) {
+                    socketWriter = new PrintWriter(entry.getValue().getOutputStream(), true);
+                    socketWriter.println(clientName + ": " + inputLine);
+                    System.out.println("Sent: \"" + inputLine + "\" to " + entry.getKey() + "from" + threadInfo);
+                }
+                // connectedClients.forEach(1, (k, v) -> {
+                // try {
+                // PrintWriter socketWriter = new PrintWriter(v.getOutputStream(), true);
+                // socketWriter.println(clientName + message);
+                // System.out.println("Sent: \"" + message + "\" to " + k + " from" + " ("
+                // + Thread.currentThread().getName() + ").");
+                // } catch (Exception e) {
+                // System.out.println(e);
+                // }
+                // });
+                System.out.println(
+                        "Received: \"" + inputLine + "\" from " + clientName + " " + remoteSocketAddress + threadInfo);
+            }
+            System.out.println("Closing connection " + remoteSocketAddress + " (" + localSocketAddress + ").");
+        } catch (Exception e) {
+            System.out.println(e);
+        } finally {
+            try {
+                // if (socketWriter != null)
+                // socketWriter.close();
+                if (socketReader != null)
+                    socketReader.close();
+                if (clientSocket != null)
+                    clientSocket.close();
+                connectedClients.remove(remoteSocketAddress);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    private class ClientInformation {
+        private final Socket clientSocket;
+        private final PrintWriter clientWriter;
+
+        public ClientInformation(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+            this.clientWriter = new PrintWriter(clientSocket.getOutputStream(), true);
+        }
+    }
+
+    // for (ConcurrentHashMap.Entry<SocketAddress, Socket> entry :
+    // connectedClients.entrySet()) {
+    // socketWriter = new PrintWriter(entry.getValue().getOutputStream(), true);
+    // socketWriter.println(clientName + ": " + inputLine);
+    // System.out.println("Sent: \"" + inputLine + "\" to " + entry.getKey() +
+    // "from" + threadInfo);
+    // }
+
+    public static void main(String[] args) {
+        System.out.println("Server started.");
+
+        // Server and client sockets
+        ServerSocket serverSocket = null;
+        Socket clientSocket = null;
+        ConcurrentHashMap<SocketAddress, Socket> connectedClients = new ConcurrentHashMap<>();
+        BlockingQueue<String> messageQueue = new ArrayBlockingQueue<String>(MAX_MESSAGES);
+        try {
+            serverSocket = new ServerSocket(PORT);
+            SocketAddress serverSocketAddress = serverSocket.getLocalSocketAddress();
+            System.out.println("Listening (" + serverSocketAddress + ").");
+
+            while (true) {
+                clientSocket = serverSocket.accept();
+                connectedClients.put(clientSocket.getRemoteSocketAddress(), clientSocket);
+                executor.execute(new ChatServer(clientSocket, connectedClients, messageQueue));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        } finally {
+            try {
+                if (serverSocket != null)
+                    serverSocket.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+}

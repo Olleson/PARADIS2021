@@ -1,0 +1,81 @@
+a) the actor model;
+It is a computational model where a system is built up with actors. The application is driven forward
+by message passing between actors who change their behaviour, states, or otherwise based on these
+messages that get sent. It's a concurrent friendly model as it enforces encapsulation. Each item
+is kept within its own scope. (process).
+
+b) the shared memory model;
+It is a model where multiple processes in an application shares the same memory (e.g., global variables, 
+data structures, states, locks, etc.). This is a disadvantageous model for concurrency and parallelism because
+resources (shared memory) needs to be properly managed among all the threads that may access it - this can 
+lead to concurrency bugs, inconsistencies or incorrect behavior.
+
+c) three ways to achieve thread-safety;
+1) Not sharing states: by making states unshared among multiple threads, you eliminate the possibility of
+race condition and other concurrency bugs. If there is no shared state, then there can be no modification,
+reading or writing of a state that will be read by others at the same time.
+
+2) Sharing immutable state: by making a shared state IMMUTABLE makes it threadsafe as you eliminate the
+possibility of race condition and other concurrency bugs. If you can't modify a state, then other threads
+won't get inconsistencies. This is a reason why functional languages are good too: they all have
+immutable data/states unlike in imperative languages like Java that pass around references.
+
+3) Synchronization: is way to enforce mutual exclusion - it is a type of mechanism to lock critical sections
+of code so that only one thread can access it at a time. Other threads are suspended when they try to access
+guarded sections. This eliminates race condition and other potential concurrency bugs if used properly as only 
+one thread can modify a shared mutable state at a time.
+
+d) read-write locks;
+Read-write locks are a type of lock where it implicitly has two types of locks: one for reading, and one for writing.
+This is useful in applications where one might read more than write to (database), you wouldn't want to lock
+the entire data when multiple people may want to read the data.
+
+e) producer-consumer pattern;
+Producer-consumer is a programming pattern where you separate the production of work and the consumption of work.
+Producers make work and place it into a queue that workers are able to take from and then consume it.
+This is a common concurrency design pattern as work can be distributed concurrently in this way.
+
+f) pessimistic vs. optimistic concurrency control;
+Pessimistic concurrency control is a type of design where one prevents other threads from accessing critical sections
+completely by locking them out. If a thread never accesses this data until another thread is complete, then it cannot
+modify a shared mutable state.
+
+Optimistic concurrency control is a type of design where threads aren't blocked and are allowed to try to modify
+critical sections but they are aborted when another thread as already updated the state. Nothing gets blocked
+in this type of design.
+
+g) deadlock, and necessary conditions for it;
+Deadlock is when multiple threads are blocked, waiting, to obtain locks that are held by other threads.
+For example:
+Thread 1 locks A                Thread 2 locks B
+Thread 1 tries to get lock B    Thread 2 tries to get lock A
+A deadlock occurs as Thread 1 tries to take a lock that is already being held, and another thread tries
+to take the lock that another thread is already holding.
+
+The necessary conditions for deadlocks to occur:
+    - Mutual exclusion: locked resources
+    - Partial allocation: resources are requested on a partial basis
+    - No pre-emption - resources cannot be forcibly retrieved
+    - Circular wait - a circle of processes or threads holding a resource and waits for another
+
+h) two ways deadlock may occur in the actor model (Erlang);
+These are two examples of communication deadlocks:
+1) Process A sends a message to Process B with the statement 'hello'. Process B only receives 'hi'.
+A will send its message to B but it will never be properly received as it does not match what it's
+expecting. (Sending incorrect message/message format without a timeout failsafe or retry mechanism 
+- though this can lead to livelock lol).
+2) Process A sends a message to process B and is expecting a response from B. However, B does not
+send a message back to A, so A sits and perpetually waits for a response that it will never get.
+(Not receiving message without a timeout failsafe or retry mechanism)
+
+i) CAP-theorem trade-off;
+It's a type of concept where it claims that in a distributed network system, you cannot guarantee
+more than three guarantees simultaneously: Consistency, Availability, Partition tolerance.
+This means that one would always have to trade a guarantee as maintaining all three is impossible.
+In essence, he means that no distributed system is safe from network failures and therefore, one has
+to either maintain consistency or availability in the event of a failure or network partition.
+
+j) map-reduce pattern.
+It's a common algorithm pattern where you apply an operation on many data items and then combine their results.
+E.g. parallelstreams.map(), etc. It's an algorithm that utilizes high-order functions to take care of 
+distribution so that the function, written by the user, can be used in a generic algorithm.

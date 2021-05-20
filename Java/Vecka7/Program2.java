@@ -1,4 +1,3 @@
-// Peter Idestam-Almquist, 2020-02-04.
 // Olivia Jiayi Xu, 2021-03-09.
 /*
 Parallelized program that distributes work in a producer-consumer pattern with a parallel stream thread pool.

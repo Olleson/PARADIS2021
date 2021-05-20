@@ -4,8 +4,6 @@
 Parallelized program that distributes work in a producer-consumer pattern with a parallel stream thread pool.
 */
 
-// [Do necessary modifications of this file.]
-
 //package paradis.assignment3;
 package Java.Vecka7;
 
@@ -14,34 +12,28 @@ import java.util.Arrays;
 public class Program2 {
     final static int NUM_WEBPAGES = 100;
     private static WebPage[] webPages = new WebPage[NUM_WEBPAGES];
-    // [You are welcome to add some variables.]
 
-    // [You are welcome to modify this method, but it should NOT be parallelized.]
     private static void initialize() {
         for (int i = 0; i < NUM_WEBPAGES; i++) {
             webPages[i] = new WebPage(i, "http://www.site.se/page" + i + ".html");
         }
     }
-
-    // [Do modify this sequential part of the program.]
+    
     private static WebPage downloadWebPage(WebPage page) {
         page.download();
         return page;
     }
 
-    // [Do modify this sequential part of the program.]
     private static WebPage analyzeWebPage(WebPage page) {
         page.analyze();
         return page;
     }
 
-    // [Do modify this sequential part of the program.]
     private static WebPage categorizeWebPage(WebPage page) {
         page.categorize();
         return page;
     }
 
-    // [You are welcome to modify this method, but it should NOT be parallelized.]
     // Makes it take in an array of WebPages, excessive but, I didn't like how the printout look with a forEach at the end.
     private static void presentResult(WebPage[] pages) {
         for (WebPage p : pages) {

@@ -42,6 +42,6 @@ e.g.
 
 Program2 doesn't "trigger" in the same way as Program1. It instead goes through each Web Page in the list and does the following:
     download
-    analysed
+    analyse
     categorize
 for each page. It's tied down by the fact that it has to go through each webpage one stage at a time despite being done on multiple threads at the same time.

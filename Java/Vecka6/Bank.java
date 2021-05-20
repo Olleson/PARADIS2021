@@ -1,24 +1,14 @@
 // Peter Idestam-Almquist, 2020-01-31.
 // Olivia Aixinjuelo, 2020-03-05.
+
 /*
 Thread safety with ReentrantReadWriteLocks. Reads are managed with Read lock, Writes are managed with Write lock on a per account basis.
 Each account has a corresponding lock in another arraylist. Implements a sleep-retry mechanic for each lock. Reentrant is also used
 to allow for nested locks - so, writelock.lock -> writelock.lock -> writelock.unlock -> writelock.unlock. Users may attempt to
 regain the same lock in this implementation multiple times. Without reetrant, it would not be able to re-acquire it.
-*/
 
-/*
-General discussion regarding timeouts and retries - are there other alternatives in Java for this type of deadlock prevention?
-During this assignment, if I did it right at all (I don't know), I found that using a retry system like this isn't super reliable.
-E.g. Because it runs on a timer, it's not guaranteed that a thread will be done by the time the timer completes (marginal difference, like . milliseconds). 
-	 You end up hoping that you get the correct result during rare occasions - for me it was when there were a thousand threads trying to modify one account's 
-	 balance (they should all go through and not timeout but because of an arbitrarily defined timer, some can fail and therefore you get incorrect results).
-
-I only ask this because it seemed like this was a preferred method of yours and it's difficult to find other alternatives / conventions.
-
-Also I would love it if you could provide usage examples or test code for us to use because it's confusing and hard to do this assignment without
-knowing how this application is used or how it should work. Kind of like how Isak did on his assignment descriptions.
-(I'm not the best at programming, and I'm more of a novice than others in the course, so from my perspective, this would've alleviated a lot of my troubles).
+*EDIT: Usage of items as locks from array list not thread safe - check java docs to see what's thread safe or not (there might be something inside the array list that does things in unsafe ways, idk bro)
+       A better solution would be to use lock ordering that's not reliant on sleep-retry.
 */
 
 //package paradis.assignment2;

@@ -1,3 +1,5 @@
+// Backup and older version where I experimented a lot.
+
 // Peter Idestam-Almquist, 2021-03-07.
 // Server, multi-threaded, accepting several simultaneous connectedClients.
 

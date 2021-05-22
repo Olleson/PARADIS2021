@@ -2,7 +2,7 @@
 // Server, multi-threaded, accepting several simultaneous clients.
 
 //package paradis.assignment4;
-package Java.Vecka8;
+package Vecka8;
 
 import java.net.Socket;
 import java.net.ServerSocket;

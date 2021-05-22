@@ -7,7 +7,7 @@ Parallelized program that distributes work in a producer-consumer pattern with a
 // [Do necessary modifications of this file.]
 
 //package paradis.assignment3;
-package Java.Vecka7;
+package Vecka7;
 
 import java.util.Arrays;
 

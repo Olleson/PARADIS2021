@@ -2,7 +2,7 @@
 
 // [Do NOT modify this file.]
 // package paradis.assignment3;
-package Java.Vecka7;
+package Vecka7;
 
 import java.util.Random;
 import java.net.URI;

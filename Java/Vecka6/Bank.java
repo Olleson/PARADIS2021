@@ -22,7 +22,7 @@ knowing how this application is used or how it should work. Kind of like how Isa
 */
 
 //package paradis.assignment2;
-package Java.Vecka6;
+package Vecka6;
 
 import java.util.List;
 import java.util.Random;

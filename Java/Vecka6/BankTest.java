@@ -1,4 +1,4 @@
-package Java.Vecka6;
+package Vecka6;
 
 import java.io.BufferedReader;
 import java.io.IOException;

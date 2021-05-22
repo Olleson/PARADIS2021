@@ -2,7 +2,7 @@
 // Client, two-threaded, responsive to incoming messages.
 
 //package paradis.assignment4;
-package Java.Vecka8;
+package Vecka8;
 
 import java.net.Socket;
 import java.net.SocketAddress;

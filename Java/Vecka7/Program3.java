@@ -6,7 +6,7 @@
 // [Do necessary modifications of this file.]
 
 //package paradis.assignment3;
-package Java.Vecka7;
+package Vecka7;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,0 +1,198 @@
+// Peter Idestam-Almquist, 2020-02-04.
+// Olivia Jiayi Xu, 2020-03-
+
+// package paradis.assignment3;
+package Java.Vecka7;
+
+// [You are welcome to add some import statements.]
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.LinkedBlockingQueue;
+
+// producer-consumer pattern
+// common forkjoinpool
+
+// initializing, downloading, analyzing, categorizing, presenting result
+// should be separated using pattern
+
+// threadsafe and performant
+public class Program1 {
+    final static int NUM_WEBPAGES = 40;
+    private static WebPage[] webPages = new WebPage[NUM_WEBPAGES];
+    // [You are welcome to add some variables.]
+
+    private static ForkJoinPool threadPool = ForkJoinPool.commonPool();
+
+    // private static BlockingQueue<Runnable> download_queue = new
+    // ArrayBlockingQueue<Runnable>(NUM_WEBPAGES);
+    // private static BlockingQueue<Runnable> analyze_queue = new
+    // ArrayBlockingQueue<Runnable>(NUM_WEBPAGES);
+    // private static BlockingQueue<Runnable> categorize_queue = new
+    // ArrayBlockingQueue<Runnable>(NUM_WEBPAGES);
+    // private static BlockingQueue<Runnable> result_queue = new
+    // ArrayBlockingQueue<Runnable>(NUM_WEBPAGES);
+
+    private static BlockingQueue<WebPage> download_queue = new LinkedBlockingQueue<WebPage>(NUM_WEBPAGES);
+    private static BlockingQueue<WebPage> analyze_queue = new LinkedBlockingQueue<WebPage>(NUM_WEBPAGES);
+    private static BlockingQueue<WebPage> categorize_queue = new LinkedBlockingQueue<WebPage>(NUM_WEBPAGES);
+    private static BlockingQueue<WebPage> result_queue = new LinkedBlockingQueue<WebPage>(NUM_WEBPAGES);
+
+    // [You are welcome to modify this method, but it should NOT be parallelized.]
+    private static void initialize() {
+        for (int i = 0; i < NUM_WEBPAGES; i++) {
+            webPages[i] = new WebPage(i, "http://www.site.se/page" + i + ".html");
+            try {
+                download_queue.put(webPages[i]);
+                // WebPage page = webPages[i];
+                // download_queue.put(() -> {
+                // page.download();
+                // });
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    static class Download implements Runnable {
+        public void run() {
+            while (true) {
+                threadPool.submit(() -> {
+                    try {
+                        WebPage page = download_queue.take();
+                        page.download();
+                        analyze_queue.put(page);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                });
+                // try {
+                //     // I think I can get this to work, just need to use my cranium some more
+                //     // Runnable task = download_queue.take();
+                //     // threadPool.submit(task);
+                //     // analyze_queue.put(task);
+                //     WebPage page = download_queue.take();
+                //     threadPool.submit(() -> {
+                //         page.download();
+                //     });
+                //     analyze_queue.put(page);
+                // } catch (Exception e) {
+                //     System.out.println(e);
+                // }
+            }
+        }
+    }
+
+    static class Analyze implements Runnable {
+        public void run() {
+            while (true) {
+                threadPool.submit(() -> {
+                    try {
+                        WebPage page = analyze_queue.take();
+                        page.analyze();
+                        categorize_queue.put(page);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                });
+                // try {
+                    // Runnable task = analyze_queue.take();
+                    // threadPool.submit(task);
+                    // categorize_queue.put(task);
+                //     WebPage page = analyze_queue.take();
+                //     threadPool.submit(() -> {
+                //         page.analyze();
+                //     });
+                //     categorize_queue.put(page);
+                // } catch (Exception e) {
+                //     System.out.println(e);
+                // }
+                // }
+            }
+        }
+    }
+
+        static class Categorize implements Runnable {
+            public void run() {
+                while (true) {
+                    threadPool.submit(() -> {
+                        try {
+                            WebPage page = categorize_queue.take();
+                            page.analyze();
+                            result_queue.put(page);
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+                    });
+                    // try {
+                    //     // Runnable task = categorize_queue.take();
+                    //     // threadPool.submit(task);
+                    //     // result_queue.put(task);
+                    //     WebPage page = analyze_queue.take();
+                    //     threadPool.submit(() -> {
+                    //         page.categorize();
+                    //     });
+                    //     result_queue.put(page);
+                    // } catch (Exception e) {
+                    //     System.out.println(e);
+                    // }
+                }
+            }
+        }
+
+        // [Do modify this sequential part of the program.]
+        private static void downloadWebPages() {
+            Download download = new Download();
+            Thread thread = new Thread(download);
+            thread.start();
+        }
+
+        // [Do modify this sequential part of the program.]
+        private static void analyzeWebPages() {
+            Analyze analyze = new Analyze();
+            Thread thread = new Thread(analyze);
+            thread.start();
+        }
+
+        // [Do modify this sequential part of the program.]
+        private static void categorizeWebPages() {
+            Categorize categorize = new Categorize();
+            Thread thread = new Thread(categorize);
+            thread.start();
+        }
+
+        // [You are welcome to modify this method, but it should NOT be parallelized.]
+        private static void presentResult() {
+            while (result_queue.size() < NUM_WEBPAGES) {
+                try {
+                    WebPage page = result_queue.take();
+                    System.out.println(page);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }
+
+        public static void main(String[] args) {
+            // Initialize the list of webpages.
+            initialize();
+
+            // Start timing.
+            long start = System.nanoTime();
+
+            // Do the work.
+            downloadWebPages();
+            analyzeWebPages();
+            categorizeWebPages();
+            System.out.println("got past do work");
+
+            // Stop timing.
+            long stop = System.nanoTime();
+
+            // Present the result.
+            presentResult();
+
+            // Present the execution time.
+            System.out.println("Execution time (seconds): " + (stop - start) / 1.0E9);
+        }
+}

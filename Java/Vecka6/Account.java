@@ -1,7 +1,7 @@
 // Peter Idestam-Almquist, 2020-01-31.
 
 // package paradis.assignment2;
-package Java.Vecka6;
+package Vecka6;
 
 class Account {
 	// Instance variables.

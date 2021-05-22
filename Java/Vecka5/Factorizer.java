@@ -7,7 +7,7 @@ this implementation is not thread safe. (The reading is unprotected and unsynchr
 */
 
 // package paradis.assignment1;
-package Java.Vecka5;
+package Vecka5;
 import java.math.BigInteger;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

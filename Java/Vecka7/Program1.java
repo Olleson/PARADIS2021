@@ -12,7 +12,7 @@ When categorize is called, empty the queue and for each webpage that is in there
 */
 
 // package paradis.assignment3;
-package Java.Vecka7;
+package Vecka7;
 
 // [You are welcome to add some import statements.]
 import java.util.concurrent.ArrayBlockingQueue;
